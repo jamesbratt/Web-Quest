@@ -1,4 +1,3 @@
-/* globals __DEV__ */
 import Phaser from 'phaser'
 import { extractPlatformDataFromBrowser } from '../utils'
 
@@ -69,14 +68,14 @@ export default class extends Phaser.Scene {
          * in a web browser as opposed to inside a chrome extension
          */
         if (process.env.NODE_ENV === 'production') {
-            chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+            chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
                 if (changeInfo.status === 'complete') {
                     this.refreshGame()
                     extractPlatformDataFromBrowser()
-                };
+                }
             })
 
-            chrome.runtime.onMessage.addListener((request, sender) => {
+            chrome.runtime.onMessage.addListener((request) => {
                 if (request.action === 'getSource') {
                     this.renderScene(request.source)
                 }
@@ -101,7 +100,7 @@ export default class extends Phaser.Scene {
 
         this.anims.create({
             key: 'turn',
-            frames: [ { key: 'dude', frame: 4 } ],
+            frames: [{ key: 'dude', frame: 4 }],
             frameRate: 20
         })
 

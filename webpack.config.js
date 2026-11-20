@@ -33,15 +33,19 @@ module.exports = (_env, { mode }) => ({
                 { from: './init.js', to: './init.js' }
             ]
         }),
-        ...(mode === 'development' ? [new BrowserSyncPlugin({
-            host: process.env.IP || 'localhost',
-            port: process.env.PORT || 3000,
-            index: 'debug.html',
-            open: false,
-            server: {
-                baseDir: './'
-            }
-        })] : [])
+        ...(mode === 'development'
+            ? [
+                    new BrowserSyncPlugin({
+                        host: process.env.IP || 'localhost',
+                        port: process.env.PORT || 3000,
+                        index: 'debug.html',
+                        open: false,
+                        server: {
+                            baseDir: './'
+                        }
+                    })
+                ]
+            : [])
     ],
     module: {
         rules: [

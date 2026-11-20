@@ -6,23 +6,21 @@
   "main": "src/main.js",
   "scripts": {
     "start": "webpack --mode=development",
-    "deploy": "webpack --mode=production"
+    "deploy": "webpack --mode=production",
+    "lint": "eslint ."
   },
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
-    "babel-eslint": "^9.0.0",
+    "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "babel-loader": "^10.0.0",
     "browser-sync": "^3.0.0",
     "browser-sync-webpack-plugin": "^2.4.0",
     "copy-webpack-plugin": "^14.0.0",
-    "eslint": "^5.5.0",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.7.0",
-    "eslint-plugin-node": "^7.0.1",
-    "eslint-plugin-promise": "^4.0.0",
-    "eslint-plugin-standard": "^4.0.0",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
     "webpack": "^5.101.0",
     "webpack-cli": "^7.0.0"
   },

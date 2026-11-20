@@ -19,6 +19,8 @@ npm start
 Open http://localhost:3000 in your browser.
 When running Open Arcade directly in the browser it depends on a data fixture in order to generate the game environment.
 
+Run `npm run lint` to check the JavaScript with ESLint. On Node.js 22, ESLint requires version 22.13.0 or later.
+
 ### As a local Chrome extension
 Sometimes you just need to test or debug something whilst Open Arcade is running as a dev tools extension. To get setup do the following:
 
