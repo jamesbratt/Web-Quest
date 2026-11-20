@@ -2,10 +2,12 @@ import Phaser from 'phaser'
 
 export default {
     type: Phaser.AUTO,
-    parent: 'content',
-    width: 800,
-    height: 600,
-    mode: Phaser.Scale.FIT,
+    backgroundColor: '#78c7f2',
+    scale: {
+        parent: 'content',
+        mode: Phaser.Scale.RESIZE,
+        expandParent: false
+    },
     localStorageName: 'phaseres6webpack',
     physics: {
         default: 'arcade',

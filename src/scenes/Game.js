@@ -1,54 +1,70 @@
 import Phaser from 'phaser'
+import { createGroundProfile } from '../ground'
 import { extractPlatformDataFromBrowser } from '../utils'
+
+const GROUND_SAMPLE_SPACING = 5
 
 export default class extends Phaser.Scene {
     constructor () {
         super({ key: 'GameScene' })
         this.cursors = null
         this.player = null
-        this.platforms = null
+        this.groundHeightAt = null
+        this.grounded = false
     }
 
     startGame () {
-        this.platforms = this.physics.add.staticGroup()
         this.player = this.physics.add.sprite(100, 300, 'dude')
-        this.cameras.main.setBounds(0, 0, 10000, 100)
         this.physics.world.setBounds(0, 0, 10000, 600)
+        this.terrain = this.add.graphics().setDepth(-1)
+        this.fitCameraToWorld(this.scale.gameSize)
+        this.scale.on(Phaser.Scale.Events.RESIZE, this.fitCameraToWorld, this)
+        this.physics.world.on(Phaser.Physics.Arcade.Events.WORLD_STEP, this.resolveGround, this)
+        this.events.once('shutdown', () => {
+            this.scale.off(Phaser.Scale.Events.RESIZE, this.fitCameraToWorld, this)
+            this.physics.world.off(Phaser.Physics.Arcade.Events.WORLD_STEP, this.resolveGround, this)
+        })
         this.cameras.main.startFollow(this.player)
-        this.physics.add.collider(this.player, this.platforms)
-        this.player.setBounce(0.2)
         this.player.setCollideWorldBounds(true)
     }
 
+    fitCameraToWorld ({ height }) {
+        const bounds = this.physics.world.bounds
+        const cameraHeight = Math.max(height, bounds.height)
+        this.cameras.main.setBounds(bounds.x, bounds.bottom - cameraHeight, bounds.width, cameraHeight)
+    }
+
     renderScene (sceneData) {
-        let x = -15
-        let y = 580
-
-        const generateScene = (nodes, hasParent) => {
-            nodes.forEach((node, i) => {
-                x = x + ((30 / 2) + 20)
-
-                if (i === (nodes.length - 1)) {
-                    y = y + 30
-                }
-
-                if (i < (nodes.length - 1) || hasParent) {
-                    this.platforms.create(x, y, 'tile')
-                }
-
-                if (node.children.length > 0) {
-                    node.children.push({ children: [] })
-                    y = y - 30
-                    generateScene(node.children, true)
-                }
-            })
+        const { right, bottom } = this.physics.world.bounds
+        this.groundHeightAt = createGroundProfile(sceneData.children, right, bottom)
+        const surface = []
+        for (let x = 0; x < right; x += GROUND_SAMPLE_SPACING) {
+            surface.push({ x, y: this.groundHeightAt(x) })
         }
+        surface.push({ x: right, y: this.groundHeightAt(right) })
 
-        generateScene(sceneData.children, false)
+        const lastRaisedPoint = surface.findLastIndex(point => point.y < bottom)
+        if (lastRaisedPoint === -1) return
+        surface.length = Math.min(surface.length, lastRaisedPoint + 2)
+        const end = surface[surface.length - 1]
+        this.terrain.fillStyle(0x318447)
+            .fillPoints([...surface, { x: end.x, y: bottom }, { x: 0, y: bottom }], true)
+            .lineStyle(2, 0x205f34)
+            .strokePoints(surface)
+    }
+
+    resolveGround () {
+        const body = this.player.body
+        const groundY = this.groundHeightAt?.(body.center.x) ?? this.physics.world.bounds.bottom
+        if (!this.grounded && body.bottom < groundY) return
+
+        body.position.y = groundY - body.height
+        body.updateCenter()
+        body.setVelocityY(0)
+        this.grounded = true
     }
 
     preload () {
-        this.load.image('tile', './assets/images/tile.png')
         this.load.spritesheet('dude',
             './assets/images/dude.png',
             { frameWidth: 32, frameHeight: 48 }
@@ -70,7 +86,9 @@ export default class extends Phaser.Scene {
 
             if (currentRequest !== requestId) return
 
-            this.platforms.clear(true, true)
+            this.terrain.clear()
+            this.groundHeightAt = null
+            this.grounded = false
             this.player.body.reset(100, 300)
             if (sceneData) this.renderScene(sceneData)
         }
@@ -132,7 +150,8 @@ export default class extends Phaser.Scene {
             this.player.anims.play('turn')
         }
 
-        if (this.cursors.up.isDown && this.player.body.touching.down) {
+        if (this.cursors.up.isDown && this.grounded) {
+            this.grounded = false
             this.player.setVelocityY(-150)
         }
     }
