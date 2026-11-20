@@ -9,7 +9,6 @@
     "deploy": "webpack --mode=production",
     "lint": "eslint ."
   },
-  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.29.0",
     "@babel/preset-env": "^7.29.0",
