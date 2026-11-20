@@ -9,12 +9,6 @@ export default class extends Phaser.Scene {
         this.platforms = null
     }
 
-    refreshGame () {
-        this.platforms.clear(true, true)
-        this.player.destroy()
-        this.startGame()
-    }
-
     startGame () {
         this.platforms = this.physics.add.staticGroup()
         this.player = this.physics.add.sprite(100, 300, 'dude')
@@ -61,31 +55,44 @@ export default class extends Phaser.Scene {
         )
     }
 
+    watchInspectedTab () {
+        const inspectedTabId = chrome.devtools.inspectedWindow.tabId
+        let requestId = 0
+
+        const refresh = async () => {
+            const currentRequest = ++requestId
+            let sceneData
+            try {
+                sceneData = await extractPlatformDataFromBrowser(inspectedTabId)
+            } catch (error) {
+                if (currentRequest === requestId) console.warn('Could not read the inspected page', error)
+            }
+
+            if (currentRequest !== requestId) return
+
+            this.platforms.clear(true, true)
+            this.player.body.reset(100, 300)
+            if (sceneData) this.renderScene(sceneData)
+        }
+
+        const onTabUpdated = (tabId, { status }) => {
+            if (tabId === inspectedTabId && status === 'complete') void refresh()
+        }
+
+        chrome.tabs.onUpdated.addListener(onTabUpdated)
+        this.events.once('shutdown', () => {
+            ++requestId
+            chrome.tabs.onUpdated.removeListener(onTabUpdated)
+        })
+        void refresh()
+    }
+
     create () {
-        /**
-         * TODO: Design some kind of harness for the game to run in.
-         * As when developing the game it is much easier to run the game
-         * in a web browser as opposed to inside a chrome extension
-         */
+        this.startGame()
         if (process.env.NODE_ENV === 'production') {
-            chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-                if (changeInfo.status === 'complete') {
-                    this.refreshGame()
-                    extractPlatformDataFromBrowser()
-                }
-            })
-
-            chrome.runtime.onMessage.addListener((request) => {
-                if (request.action === 'getSource') {
-                    this.renderScene(request.source)
-                }
-            })
-
-            this.startGame()
-            extractPlatformDataFromBrowser()
+            this.watchInspectedTab()
         } else {
             const devData = require('../../fixtures/dev-data.json')
-            this.startGame()
             this.renderScene(devData)
         }
 

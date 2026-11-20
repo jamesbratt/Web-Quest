@@ -35,6 +35,5 @@ This generates everything Chrome needs to unpack the extension inside of the dis
 - In Chrome go to chrome://extensions and toggle Developer Mode to be on.
 - Click Load Unpacked and select the dist folder
 
-The extension should now be installed in your browser.
-Open a new tab and open dev tools. There should be an additional tab named Open Arcade.
+Open a regular web page, open Chrome DevTools, and select the **Game** panel. The level is generated from the inspected page and refreshes when that tab finishes loading a new page.
 
