@@ -1,9 +1,9 @@
 {
-    "name":"Game",
-    "version":"0.0.1",
-    "manifest_version": 3,
-    "description":"A game",
-    "permissions": ["scripting"],
-    "host_permissions": ["<all_urls>"],
-    "devtools_page": "init.html"
- }
+  "name": "Web Quest",
+  "version": "0.0.1",
+  "manifest_version": 3,
+  "description": "An open world game where your environment is generated as you browse the internet",
+  "permissions": ["scripting"],
+  "host_permissions": ["<all_urls>"],
+  "devtools_page": "init.html"
+}

@@ -1,1 +1,1 @@
-chrome.devtools.panels.create('Game', null, 'index.html', null)
+chrome.devtools.panels.create('Web Quest', null, 'index.html', null)
