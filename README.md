@@ -7,7 +7,7 @@ Open Arcade is a Chrome dev tools extension, which allows your avatar to explore
 Install Node on your computer and clone this repository, then run:
 
 ```
-npm install
+npm ci
 ```
 
 To run Open Arcade locally in your web browser i.e. not as a Chrome dev tools extension (easier if your developing), run:
@@ -16,7 +16,7 @@ To run Open Arcade locally in your web browser i.e. not as a Chrome dev tools ex
 npm start
 ```
 
-Open Arcade should open inside your browser served from localhost on port 3000.
+Open http://localhost:3000 in your browser.
 When running Open Arcade directly in the browser it depends on a data fixture in order to generate the game environment.
 
 ### As a local Chrome extension

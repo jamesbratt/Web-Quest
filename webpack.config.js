@@ -3,7 +3,8 @@ var webpack = require('webpack')
 const CopyPlugin = require('copy-webpack-plugin')
 var BrowserSyncPlugin = require('browser-sync-webpack-plugin')
 
-module.exports = {
+module.exports = (_env, { mode }) => ({
+    target: 'web',
     entry: {
         app: [path.resolve(__dirname, 'src/main.js')],
         vendor: ['phaser']
@@ -17,7 +18,7 @@ module.exports = {
         publicPath: './dist/',
         filename: '[name].bundle.js'
     },
-    watch: true,
+    watch: mode === 'development',
     plugins: [
         new webpack.DefinePlugin({
             CANVAS_RENDERER: JSON.stringify(true),
@@ -32,14 +33,15 @@ module.exports = {
                 { from: './init.js', to: './init.js' }
             ]
         }),
-        new BrowserSyncPlugin({
+        ...(mode === 'development' ? [new BrowserSyncPlugin({
             host: process.env.IP || 'localhost',
             port: process.env.PORT || 3000,
             index: 'debug.html',
+            open: false,
             server: {
-                baseDir: ['./', './build']
+                baseDir: './'
             }
-        })
+        })] : [])
     ],
     module: {
         rules: [
@@ -50,4 +52,4 @@ module.exports = {
             }
         ]
     }
-}
+})
